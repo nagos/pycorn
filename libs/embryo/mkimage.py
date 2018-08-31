@@ -95,8 +95,9 @@ except IOError:
         sys.exit(1)
 
 struct = Struct("!IIIIIIIBBBB"+str(IMG_NAME_LENGTH)+"s")
+struct_size = Struct("!LL")
 
-outputfile.seek(struct.size);
+outputfile.seek(struct.size+struct_size.size);
 
 inputcrc = 0;
 
@@ -120,8 +121,11 @@ structdata =  struct.pack(MAGIC, headercrc, int(time.time()), inputsize,
                 oss[options.os], archs[options.arch], types[options.type],
                 comps[options.comp], options.name)
 
+structdata_size =  struct_size.pack(inputsize, 0)
+
 outputfile.seek(0)
 outputfile.write(structdata)
+outputfile.write(structdata_size)
 outputfile.close()
 inputfile.close()
 
